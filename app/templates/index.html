@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% from 'macros/forms.html' import render_filter_form %}
+{% from 'macros/products.html' import render_product_grid, render_pagination %}
+
+{% block title %}IDMAX Fashion House - Home{% endblock %}
+
+{% block content %}
+{% if current_user.is_authenticated and current_user.is_admin %}
+<!-- Admin Quick Access Banner -->
+<div class="alert alert-primary d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <i class="bi bi-shield-fill"></i> <strong>Admin Access:</strong> You're logged in with administrative privileges.
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Go to Admin Dashboard</a>
+</div>
+{% endif %}
+
+<!-- Hero Section -->
+<section class="bg-dark text-white text-center py-5 mb-5 rounded-3 shadow">
+    <div class="py-4">
+        <h1 class="display-3 fw-bold">MY Catalogue</h1>
+        <p class="lead fs-4 mb-4">Discover the latest trends from top fashion brands</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('products.product_list') }}" class="btn btn-primary btn-lg px-4">Browse Products</a>
+            <a href="{{ url_for('brands.brand_list') }}" class="btn btn-outline-light btn-lg px-4">View Brands</a>
+        </div>
+        <div class="mt-4">
+            <div class="badge bg-secondary fs-6 p-2 m-1">{{ total_products }} Products</div>
+            <div class="badge bg-secondary fs-6 p-2 m-1">{{ total_brands }} Brands</div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-left-primary shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex no-gutters align-items-center">
+                        <div class="mr-3">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Products</div>
+                            <div class="h3 mb-0 font-weight-bold text-gray-800">{{ total_products }}</div>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <i class="bi bi-box fs-1 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-left-success shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex no-gutters align-items-center">
+                        <div class="mr-3">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Available Brands</div>
+                            <div class="h3 mb-0 font-weight-bold text-gray-800">{{ total_brands }}</div>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <i class="bi bi-award fs-1 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex no-gutters align-items-center">
+                        <div class="mr-3">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Price Range</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">£{{ "%.0f"|format(price_stats.min_price) }} - £{{ "%.0f"|format(price_stats.max_price) }}</div>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <i class="bi bi-currency-pound fs-1 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Use the filter form macro #}
+{{ render_filter_form(
+    url=url_for('main.index'),
+    brands=brands,
+    colors=colors,
+    genders=genders,
+    price_stats=price_stats,
+    selected_gender=selected_gender,
+    selected_brand_id=selected_brand_id,
+    selected_color=selected_color,
+    selected_min_price=selected_min_price,
+    selected_max_price=selected_max_price
+) }}
+
+<section>
+    <!-- Featured Products Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">Featured Products</h2>
+        <a href="{{ url_for('products.product_list') }}" class="btn btn-sm btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    {# Use the product grid macro #}
+    {{ render_product_grid(products.items, "No featured products available at the moment.") }}
+
+</section>
+
+<!-- Popular Brands Section -->
+<section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3">Popular Brands</h2>
+        <a href="{{ url_for('brands.brand_list') }}" class="btn btn-sm btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        {% for brand in brands[:4] %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm brand-card">
+                <div class="card-body">
+                    <h3 class="h5 card-title">{{ brand.name }}</h3>
+                    {% if brand.description %}
+                    <p class="card-text small text-muted">{{ brand.description|truncate(70) }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{{ url_for('brands.brand_detail', brand_id=brand.id) }}" class="btn btn-sm btn-outline-primary">Browse Products</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+
+    
+    {# Use the pagination macro #}
+    <!--
+    {{ render_pagination(
+        pagination=products,
+        endpoint='main.index',
+        gender=selected_gender,
+        brand_id=selected_brand_id,
+        color=selected_color,
+        min_price=selected_min_price,
+        max_price=selected_max_price
+    ) }} 
+    -->  
+ 

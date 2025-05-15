@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ legend }} | IDMAX Fashion House{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-dark text-white">
+          <h5 class="m-0 font-weight-bold">{{ legend }}</h5>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              {{ form.name.label(class="form-label") }}
+              {% if form.name.errors %}
+                {{ form.name(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.name.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.name(class="form-control") }}
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              {{ form.description.label(class="form-label") }}
+              {% if form.description.errors %}
+                {{ form.description(class="form-control is-invalid", rows=4) }}
+                <div class="invalid-feedback">
+                  {% for error in form.description.errors %}
+                    <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.description(class="form-control", rows=4) }}
+              {% endif %}
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{{ url_for('admin.brands') }}" class="btn btn-outline-secondary">Cancel</a>
+              {{ form.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

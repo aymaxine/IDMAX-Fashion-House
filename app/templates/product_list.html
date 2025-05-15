@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% from 'macros/forms.html' import render_filter_form %}
+{% from 'macros/products.html' import render_product_grid, render_pagination %}
+
+{% block title %}Products | IDMAX Fashion House{% endblock %}
+
+{% block content %}
+<section class="text-center mb-4 mt-3">
+    <h2 class="display-4">Our Fashion Products</h2>
+    <p class="lead">Discover the latest trends in fashion</p>
+</section>
+
+{# Use the filter form macro #}
+{{ render_filter_form(
+    url=url_for('products.product_list'),
+    brands=brands,
+    colors=colors,
+    genders=genders,
+    price_stats=price_stats,
+    selected_gender=selected_gender,
+    selected_brand_id=selected_brand_id,
+    selected_color=selected_color,
+    selected_min_price=selected_min_price,
+    selected_max_price=selected_max_price
+) }}
+
+{# Use the product grid macro #}
+{{ render_product_grid(products.items, "No products found matching your search criteria. Try adjusting your filters.", show_compare_button=True) }}
+
+{# Use the pagination macro #}
+{{ render_pagination(
+    pagination=products,
+    endpoint='products.product_list',
+    gender=selected_gender,
+    brand_id=selected_brand_id,
+    color=selected_color,
+    min_price=selected_min_price,
+    max_price=selected_max_price
+) }}
+{% endblock %}

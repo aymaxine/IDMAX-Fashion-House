@@ -1,0 +1,477 @@
+{% extends "admin/layout.html" %}
+{% block admin_title %}Dashboard{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Admin Dashboard</h2>
+    <div>
+      <a href="{{ url_for('admin.new_product') }}" class="btn btn-p                    {% if product.images.count() > 0 %}
+                      {% for image in product.images[:1] %}
+                      {% set thumbnail = 'thumbnails/' + image.filename %}
+                      <img src="{{ url_for('static', filename='uploads/products/' + thumbnail) }}" 
+                             alt="{{ product.name }}" 
+                             width="30" height="30" 
+                             loading="lazy"
+                             style="object-fit: contain;" 
+                             class="me-1"
+                             onerror="this.onerror=null; this.src='{{ url_for('static', filename='uploads/products/' + image.filename) }}'">
+                      {% endfor %}
+                    {% else %}
+                      <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                           alt="No image available" 
+                           width="30" height="30" 
+                           loading="lazy"
+                           style="object-fit: contain;" 
+                           class="me-1">
+                    {% endif %}lass="bi bi-plus-circle"></i> Add Product</a>
+      <a href="{{ url_for('admin.new_brand') }}" class="btn btn-outline-primary ms-2"><i class="bi bi-plus-circle"></i> Add Brand</a>
+      <a href="{{ url_for('admin_orders.manage_orders') }}" class="btn btn-outline-success ms-2"><i class="bi bi-box-seam"></i> Manage Orders</a>
+    </div>
+  </div>
+
+  <!-- Search Box -->
+  <div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+      <div class="card shadow">
+        <div class="card-body">
+          <form action="{{ url_for('products.search') }}" method="GET" class="d-flex">
+            <input type="text" name="q" class="form-control" placeholder="Search for products, brands or users...">
+            <button type="submit" class="btn btn-primary ms-2">
+              <i class="bi bi-search"></i> Search
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Products</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ product_count }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-box fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Orders stats card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Orders</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ order_count }}</div>
+              <div class="small mt-1">
+                <span class="text-warning">{{ processing_orders }}</span> processing,
+                <span class="text-success">£{{ '{:,.2f}'.format(total_revenue) }}</span> revenue
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-cart-check fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- New image stats card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Product Images</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ image_count }}</div>
+              <div class="small mt-1">
+                <span class="text-success">{{ products_with_images }}</span> products with images,
+                <span class="text-danger">{{ products_without_images }}</span> without
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-images fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Brands</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ brand_count }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-award fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Users</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ user_count }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-people fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">System Status</div>
+              <div class="h6 mb-0 font-weight-bold text-gray-800">
+                Database: {{ db_size_mb }} MB<br>
+                Last Product: {{ db_stats.last_product }}<br>
+                Last User: {{ db_stats.last_user }}
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-gear fs-2 text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Analytics Charts -->
+  <div class="row mt-4">
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Products by Gender</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if gender_chart %}
+            <img src="{{ gender_chart }}" alt="Gender Distribution Chart" class="img-fluid mb-3">
+            <button class="btn btn-sm btn-outline-secondary toggle-view" data-target="gender">Show Table</button>
+            <div class="data-table" id="gender-table" style="display: none;">
+              {{ gender_table|safe }}
+            </div>
+          {% else %}
+            <p class="text-muted">No data</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Top 5 Brands</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if brand_chart %}
+            <img src="{{ brand_chart }}" alt="Top Brands Chart" class="img-fluid mb-3">
+            <button class="btn btn-sm btn-outline-secondary toggle-view" data-target="brand">Show Table</button>
+            <div class="data-table" id="brand-table" style="display: none;">
+              {{ brand_table|safe }}
+            </div>
+          {% else %}
+            <p class="text-muted">No data</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Price Distribution</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if price_chart %}
+            <img src="{{ price_chart }}" alt="Price Distribution Chart" class="img-fluid mb-3">
+            <button class="btn btn-sm btn-outline-secondary toggle-view" data-target="price">Show Table</button>
+            <div class="data-table" id="price-table" style="display: none;">
+              {{ price_table|safe }}
+            </div>
+          {% else %}
+            <p class="text-muted">No data</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Order Analytics -->
+  <div class="row mt-4">
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-success">Order Status Distribution</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if order_status_chart %}
+            <img src="{{ order_status_chart }}" alt="Order Status Chart" class="img-fluid mb-3">
+            <button class="btn btn-sm btn-outline-secondary toggle-view" data-target="order-status">Show Table</button>
+            <div class="data-table" id="order-status-table" style="display: none;">
+              {{ order_status_table|safe }}
+            </div>
+          {% else %}
+            <p class="text-muted">No order status data available</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-success">Monthly Revenue</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if monthly_revenue_chart %}
+            <img src="{{ monthly_revenue_chart }}" alt="Monthly Revenue Chart" class="img-fluid">
+          {% else %}
+            <p class="text-muted">No revenue data available</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Monthly Trend Chart -->
+  <div class="row mt-4">
+    <div class="col-12 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Monthly Product Trends</h6>
+        </div>
+        <div class="card-body text-center">
+          {% if monthly_chart %}
+            <img src="{{ monthly_chart }}" alt="Monthly Trends Chart" class="img-fluid">
+          {% else %}
+            <p class="text-muted">No monthly trend data available</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Data -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Export Data</h6>
+        </div>
+        <div class="card-body">          <p>Export your catalog data for backup or analysis:</p>
+          <a href="{{ url_for('export.export_products') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-file-earmark-excel"></i> Export Products
+          </a>
+          <a href="{{ url_for('export.export_brands') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-file-earmark-excel"></i> Export Brands
+          </a>
+          <a href="{{ url_for('export.export_users') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-file-earmark-excel"></i> Export Users
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest Products, Recent Orders, and Recent Users -->
+  <div class="row mt-4">
+    <!-- Recent Products -->
+    <div class="col-lg-12 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Recent Products</h6>
+          <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Brand</th>
+                  <th>Price</th>
+                  <th>Gender</th>
+                  <th>Added</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in latest_products %}
+                <tr>
+                  <td>
+                    {% if product.num_images > 0 %}
+                      {% for image in product.images[:1] %}
+                      {% set thumbnail = 'thumbnails/' + image.filename %}
+                      <img src="{{ url_for('static', filename='uploads/products/' + thumbnail) }}" 
+                             alt="{{ product.name }}" 
+                             width="30" height="30" 
+                             loading="lazy"
+                             style="object-fit: contain;" 
+                             class="me-1"
+                             onerror="this.onerror=null; this.src='{{ url_for('static', filename='uploads/products/' + image.filename) }}'">
+                      {% endfor %}
+                    {% endif %}
+                    {{ product.name }}
+                  </td>
+                  <td>{{ product.brand_info.name }}</td>
+                  <td>£{{ "%.2f"|format(product.price) }}</td>
+                  <td>{{ product.gender }}</td>
+                  <td>{{ product.created_at.strftime('%Y-%m-%d') }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{{ url_for('admin.edit_product', product_id=product.product_id) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a href="{{ url_for('products.product_detail', product_id=product.product_id) }}" class="btn btn-outline-secondary" target="_blank">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                      {% if product.num_images > 0 %}
+                      <a href="{{ url_for('admin.product_images', product_id=product.product_id) }}" class="btn btn-outline-info">
+                        <i class="bi bi-images"></i>
+                      </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-success">Recent Orders</h6>
+          <a href="{{ url_for('admin_orders.manage_orders') }}" class="btn btn-sm btn-success">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                  <td>
+                    <a href="{{ url_for('admin_orders.order_details', order_id=order.id) }}" class="text-decoration-none fw-bold">
+                      {{ order.order_number }}
+                    </a>
+                  </td>
+                  <td>{{ order.full_name }}</td>
+                  <td>£{{ "%.2f"|format(order.total_amount) }}</td>
+                  <td>
+                    {% if order.status == 'Processing' %}
+                      <span class="badge bg-warning text-dark">{{ order.status }}</span>
+                    {% elif order.status == 'Shipped' %}
+                      <span class="badge bg-info">{{ order.status }}</span>
+                    {% elif order.status == 'Delivered' %}
+                      <span class="badge bg-success">{{ order.status }}</span>
+                    {% elif order.status == 'Cancelled' %}
+                      <span class="badge bg-danger">{{ order.status }}</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ order.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+                {% if not recent_orders %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted">No orders yet</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Users -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Recent Users</h6>
+          <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Joined</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in recent_users %}
+                <tr>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                  <td>
+                    {% if user.is_admin %}
+                    <span class="badge bg-danger">Admin</span>
+                    {% else %}
+                    <span class="badge bg-secondary">User</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>    </div>
+  </div>
+{% endblock %}
+
+{% block admin_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle between chart and table view
+    const toggleButtons = document.querySelectorAll('.toggle-view');
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        const tableElement = document.getElementById(`${target}-table`);
+        
+        if (tableElement.style.display === 'none') {
+          tableElement.style.display = 'block';
+          this.textContent = 'Show Chart';
+        } else {
+          tableElement.style.display = 'none';
+          this.textContent = 'Show Table';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

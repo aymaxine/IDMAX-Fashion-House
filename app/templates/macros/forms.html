@@ -1,0 +1,56 @@
+{% macro render_filter_form(url, brands, colors, genders, price_stats, selected_gender=None, selected_brand_id=None, selected_color=None, selected_min_price=None, selected_max_price=None) %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h3 class="h5 mb-0">Filter Products</h3>
+    </div>
+    <div class="card-body">
+        <form action="{{ url }}" method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select name="gender" id="gender" class="form-select">
+                        <option value="">All</option>
+                        {% for gender in genders %}
+                        <option value="{{ gender }}" {% if selected_gender == gender %}selected{% endif %}>{{ gender }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="brand_id" class="form-label">Brand</label>
+                    <select name="brand_id" id="brand_id" class="form-select">
+                        <option value="">All</option>
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if selected_brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="color" class="form-label">Color</label>
+                    <select name="color" id="color" class="form-select">
+                        <option value="">All</option>
+                        {% for color in colors %}
+                        <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Price Range (£)</label>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="number" name="min_price" id="min_price" class="form-control form-control-sm" placeholder="Min" value="{{ selected_min_price or '' }}" min="{{ price_stats.min_price }}" max="{{ price_stats.max_price }}">
+                        <span>-</span>
+                        <input type="number" name="max_price" id="max_price" class="form-control form-control-sm" placeholder="Max" value="{{ selected_max_price or '' }}" min="{{ price_stats.min_price }}" max="{{ price_stats.max_price }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-3">
+                <a href="{{ url }}" class="btn btn-outline-secondary me-2">Reset</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}

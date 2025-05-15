@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{% block admin_title %}Admin{% endblock %} | IDMAX Fashion House{% endblock %}
+
+{% block content_wrapper %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-2 bg-dark text-white pt-3 min-vh-100 d-none d-lg-block">
+            <h5 class="text-center mb-4 border-bottom pb-2">Admin Dashboard</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('admin.products') }}">
+                        <i class="bi bi-box me-2"></i>Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('admin.brands') }}">
+                        <i class="bi bi-award me-2"></i>Brands
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('admin_orders.manage_orders') }}">
+                        <i class="bi bi-bag-check me-2"></i>Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('admin.users') }}">
+                        <i class="bi bi-people me-2"></i>Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ url_for('main.index') }}" target="_blank">
+                        <i class="bi bi-eye me-2"></i>View Site
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-10">
+            <div class="py-3">
+                <!-- Mobile Top Navigation -->
+                <div class="d-lg-none mb-4">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="adminMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-list me-2"></i>Admin Menu
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="adminMenuDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.products') }}"><i class="bi bi-box me-2"></i>Products</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.brands') }}"><i class="bi bi-award me-2"></i>Brands</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_orders.manage_orders') }}"><i class="bi bi-bag-check me-2"></i>Orders</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.users') }}"><i class="bi bi-people me-2"></i>Users</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.index') }}" target="_blank"><i class="bi bi-eye me-2"></i>View Site</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% block admin_scripts %}{% endblock %}
+{% endblock %}

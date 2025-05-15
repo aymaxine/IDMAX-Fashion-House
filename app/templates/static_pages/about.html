@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | IDMAX Fashion House {% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm mb-5">
+                <div class="card-body p-5">
+                    <h1 class="display-5 mb-4">About IDMAX Fashion House</h1>
+                    <p class="lead">Your one-stop destination for expressing your creativity through fashion.</p>
+                    
+                    <hr class="my-4">
+                    
+                    <h2 class="h4 mb-3">Our Mission</h2>
+                    <p>At IDMAX Fashion House, we aim to provide a comprehensive range of fashion pieces. Our mission is to help customers discover the latest trends, compare products across brands, and make informed fashion choices.</p>
+                    
+                    <h2 class="h4 mt-5 mb-3">What We Offer</h2>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="text-primary mb-3">
+                                        <i class="bi bi-box fs-3"></i>
+                                    </div>
+                                    <h3 class="h5">Diverse Collection</h3>
+                                    <p class="card-text">Browse through thousands of fashion products ranging from clothing to accessories across various brands, genders, and price points.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="text-primary mb-3">
+                                        <i class="bi bi-funnel fs-3"></i>
+                                    </div>
+                                    <h3 class="h5">Advanced Filtering</h3>
+                                    <p class="card-text">With your convenience in mind, our powerful filtering system allows you to narrow down your search based on brand, gender, color, and price range.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="text-primary mb-3">
+                                        <i class="bi bi-award fs-3"></i>
+                                    </div>
+                                    <h3 class="h5">Top Brands</h3>
+                                    <p class="card-text">Discover products from the most popular fashion brands worldwide, all in one convenient place.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="text-primary mb-3">
+                                        <i class="bi bi-info-circle fs-3"></i>
+                                    </div>
+                                    <h3 class="h5">Detailed Information</h3>
+                                    <p class="card-text">Get comprehensive details about each product, including pricing, colors, and descriptions to make informed decisions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="h4 mt-5 mb-3">Our Data</h2>
+                    <p>The products presented by us at IDMAX Fashion House incorporates thousands of products from an open fashion dataset, providing a rich and diverse collection for users to explore. Our website is regularly updated to ensure the information stays relevant and accurate.</p>
+                    
+                    <div class="bg-light p-4 rounded-3 mt-5">
+                        <h3 class="h5">Connect With Us</h3>
+                        <p class="mb-3">Have questions or feedback? We'd love to hear from you!</p>
+                        <a href="{{ url_for('static_pages.contact') }}" class="btn btn-primary">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

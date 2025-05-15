@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-{{ 12 // products|length if products|length > 0 else 12 }} mb-4">
+                    <div class="card h-100">
+                        {% if product.images.first() %}
+                            {% set first_image = product.images.first() %}
+                            {% set filename_parts = first_image.filename.split('.') %}
+                            {% set filename_base = filename_parts[0] %}
+                            {% set filename_ext = filename_parts[1] %}
+                            {% set thumbnail_name = filename_base + '_thumb.' + filename_ext %}
+                            <img src="{{ url_for('static', filename='uploads/products/' + thumbnail_name) }}" 
+                                 class="card-img-top" 
+                                 alt="{{ product.name }}"
+                                 onerror="this.onerror=null; this.src='{{ url_for('static', filename='uploads/products/' + first_image.filename) }}';">                        {% else %}
+                            <img src="{{ url_for('static', filename='images/placeholder.png') }}" class="card-img-top" alt="No image available" style="height: 200px; object-fit: contain; padding: 20px;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text"><strong>Brand:</strong> {{ product.brand_info.name if product.brand_info else 'N/A' }}</p>                            <p class="card-text"><strong>Price:</strong> £{{ "%.2f"|format(product.price) }}</p>
+                            <p class="card-text"><strong>Gender:</strong> {{ product.gender }}</p>
+                            <p class="card-text"><strong>Color:</strong> {{ product.primary_color or 'Not specified' }}</p>
+                            <p class="card-text">{{ (product.description or 'No description available')|truncate(100) }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <form action="{{ url_for('compare.remove_from_compare', product_id=product.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                            </form>
+                            <a href="{{ url_for('products.product_detail', product_id=product.product_id) }}" class="btn btn-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mt-3">
+            <form action="{{ url_for('compare.clear_compare') }}" method="POST">
+                <button type="submit" class="btn btn-warning">Clear Comparison List</button>
+            </form>
+        </div>
+    {% else %}
+        <p>Your comparison list is empty. Add some products to compare!</p>
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary">Browse Products</a>
+    {% endif %}
+</div>
+{% endblock %}

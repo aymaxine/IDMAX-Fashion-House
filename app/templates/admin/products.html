@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Manage Products | IDMAX Fashion House{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2>Manage Products</h2>
+      <div class="mt-2">
+        <a href="{{ url_for('admin.products', status='') }}" class="btn btn-sm {{ 'btn-primary' if not status else 'btn-outline-primary' }}">
+          All ({{ active_count + inactive_count }})
+        </a>
+        <a href="{{ url_for('admin.products', status='active') }}" class="btn btn-sm {{ 'btn-primary' if status == 'active' else 'btn-outline-primary' }}">
+          Active ({{ active_count }})
+        </a>
+        <a href="{{ url_for('admin.products', status='inactive') }}" class="btn btn-sm {{ 'btn-primary' if status == 'inactive' else 'btn-outline-primary' }}">
+          Inactive ({{ inactive_count }})
+        </a>
+      </div>
+    </div>
+    <div>
+      <a href="{{ url_for('admin.new_product') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add New Product
+      </a>
+    </div>
+  </div>
+    <div class="card shadow">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>
+                <a href="{{ url_for('admin.products', sort_by='name', order='asc' if sort_by == 'name' and order == 'desc' else 'desc') }}" class="text-dark text-decoration-none">
+                  Product Name
+                  {% if sort_by == 'name' %}
+                    <i class="bi bi-caret-{{ 'up' if order == 'asc' else 'down' }}-fill"></i>
+                  {% endif %}
+                </a>
+              </th>
+              <th>Brand</th>
+              <th>
+                <a href="{{ url_for('admin.products', sort_by='price', order='asc' if sort_by == 'price' and order == 'desc' else 'desc') }}" class="text-dark text-decoration-none">
+                  Price (GBP)
+                  {% if sort_by == 'price' %}
+                    <i class="bi bi-caret-{{ 'up' if order == 'asc' else 'down' }}-fill"></i>
+                  {% endif %}
+                </a>
+              </th>
+              <th>Gender</th>
+              <th>Color</th>
+              <th>Images</th>
+              <th>
+                <a href="{{ url_for('admin.products', sort_by='created_at', order='asc' if sort_by == 'created_at' and order == 'desc' else 'desc') }}" class="text-dark text-decoration-none">
+                  Added
+                  {% if sort_by == 'created_at' or not sort_by %}
+                    <i class="bi bi-caret-{{ 'up' if order == 'asc' else 'down' }}-fill"></i>
+                  {% endif %}
+                </a>
+              </th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products.items %}
+            <tr>
+              <td>{{ product.product_id }}</td>
+              <td>
+                {% set primary_image = none %}                {% if product.num_images > 0 %}
+                  {% set found = false %}
+                  {# Convert to list with .all() to prevent AppenderQuery issues #}
+                  {% set product_images = product.images.all() %}
+                  {% for image in product_images if not found %}
+                    {% if image.is_primary %}
+                      {% set primary_image = image %}
+                      {% set found = true %}
+                    {% endif %}
+                  {% endfor %}
+                    {% if primary_image %}
+                    {% set filename_parts = primary_image.filename.split('.') %}
+                    {% set filename_base = filename_parts[0] %}
+                    {% set filename_ext = filename_parts[1] %}
+                    {% set thumbnail = filename_base + '_thumb.' + filename_ext %}
+                    
+                    <img src="{{ url_for('static', filename='uploads/products/' + thumbnail) }}" 
+                         alt="{{ product.name }}" 
+                         class="img-thumbnail" 
+                         width="50" height="50"
+                         loading="lazy"
+                         style="object-fit: contain;"
+                         onerror="this.onerror=null; this.src='{{ url_for('static', filename='uploads/products/' + primary_image.filename) }}'">{% else %}                    <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                         alt="No image available" 
+                         class="img-thumbnail" 
+                         width="50" height="50"
+                         loading="lazy"
+                         style="object-fit: contain;">
+                  {% endif %}
+                {% else %}
+                  <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                       alt="No image available" 
+                       class="img-thumbnail" 
+                       width="50" height="50"
+                       loading="lazy"
+                       style="object-fit: contain;">
+                {% endif %}</td>
+              <td>
+                {{ product.name }}
+                {% if not product.active %}
+                <span class="badge bg-danger ms-1">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ product.brand_info.name }}</td>
+              <td>£{{ "%.2f"|format(product.price) }}</td>
+              <td>{{ product.gender }}</td>
+              <td>
+                <span class="color-dot" style="background-color: {{ product.primary_color }};"></span>
+                {{ product.primary_color }}
+              </td>
+              <td>
+                {% if product.num_images > 0 %}
+                <a href="{{ url_for('admin.product_images', product_id=product.product_id) }}" class="badge bg-info text-decoration-none">
+                  {{ product.num_images }} images
+                </a>
+                {% else %}
+                <span class="badge bg-secondary">No images</span>
+                {% endif %}
+              </td>              <td>{{ product.created_at.strftime('%Y-%m-%d') }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('products.product_detail', product_id=product.product_id) }}" class="btn btn-outline-secondary" target="_blank">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ url_for('admin.edit_product', product_id=product.product_id) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" class="btn btn-outline-{{ 'success' if not product.active else 'warning' }}" data-bs-toggle="modal" 
+                          data-bs-target="#statusModal-{{ product.product_id }}">
+                    <i class="bi bi-{{ 'check-circle' if not product.active else 'dash-circle' }}"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" 
+                          data-bs-target="#deleteModal-{{ product.product_id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>      </div>
+    </div>
+    <div class="card-footer">
+      <nav aria-label="Product navigation">
+        <ul class="pagination justify-content-center mb-0">
+          {% if products.has_prev %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('admin.products', page=products.prev_num, sort_by=sort_by, order=order, status=status) }}">
+                <i class="bi bi-chevron-left"></i> Previous
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link"><i class="bi bi-chevron-left"></i> Previous</span>
+            </li>
+          {% endif %}
+          
+          {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+              {% if products.page == page_num %}
+                <li class="page-item active">
+                  <a class="page-link" href="{{ url_for('admin.products', page=page_num, sort_by=sort_by, order=order, status=status) }}">{{ page_num }}</a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="{{ url_for('admin.products', page=page_num, sort_by=sort_by, order=order, status=status) }}">{{ page_num }}</a>
+                </li>
+              {% endif %}
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+          {% endfor %}
+            {% if products.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('admin.products', page=products.next_num, sort_by=sort_by, order=order, status=status) }}">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next <i class="bi bi-chevron-right"></i></span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Modal Dialogs moved here, outside of .card.shadow -->
+  {% for product in products.items %}
+  <!-- Toggle Status Modal -->
+  <div class="modal fade" id="statusModal-{{ product.product_id }}" tabindex="-1" aria-labelledby="statusModalLabel-{{ product.product_id }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content shadow">
+        <div class="modal-header bg-{{ 'success' if not product.active else 'warning' }} text-white">
+          <h5 class="modal-title" id="statusModalLabel-{{ product.product_id }}">{{ "Activate" if not product.active else "Deactivate" }} Product</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% if product.active %}
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-dash-circle text-warning fs-4 me-2"></i>
+            <p class="mb-0">Are you sure you want to deactivate the product: <strong>{{ product.name }}</strong>?</p>
+          </div>
+          <p class="text-muted small ms-4">Deactivated products will not be visible to customers but will still be linked to existing orders.</p>
+          {% else %}
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-check-circle text-success fs-4 me-2"></i>
+            <p class="mb-0">Are you sure you want to activate the product: <strong>{{ product.name }}</strong>?</p>
+          </div>
+          <p class="text-muted small ms-4">Activated products will be visible to customers in the store.</p>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form action="{{ url_for('admin.toggle_product_status', product_id=product.product_id) }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-{{ 'success' if not product.active else 'warning' }}">
+              <i class="bi bi-{{ 'check-circle' if not product.active else 'dash-circle' }} me-1"></i>
+              {{ "Activate" if not product.active else "Deactivate" }} Product
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal-{{ product.product_id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ product.product_id }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deleteModalLabel-{{ product.product_id }}">Confirm Delete</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-4 me-2"></i>
+            <p class="mb-0">Are you sure you want to delete the product: <strong>{{ product.name }}</strong>?</p>
+          </div>
+          {% if product.order_count and product.order_count > 0 %}
+          <div class="alert alert-warning mt-3">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-exclamation-circle me-2"></i>
+              <div>
+                <strong>Warning:</strong> This product is associated with orders.
+                <p class="mb-0 small">Consider deactivating the product instead of deleting it to maintain order history.</p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form action="{{ url_for('admin.delete_product', product_id=product.product_id) }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash me-1"></i>
+              Delete Product
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

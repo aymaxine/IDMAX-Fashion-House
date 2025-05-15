@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Brands | IDMAX Fashion House{% endblock %}
+
+{% block content %}
+<section class="text-center mb-5 mt-4">
+    <h1 class="display-4">Fashion Brands</h1>
+    <p class="lead">Explore our collection of {{ brands|length }} fashion brands</p>
+</section>
+
+<div class="row g-4">
+    {% for brand, product_count in brands %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm brand-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h3 card-title mb-0">{{ brand.name }}</h2>
+                    <span class="badge bg-primary">{{ product_count }} products</span>
+                </div>
+                {% if brand.description %}
+                <p class="card-text text-muted">{{ brand.description|truncate(100) }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small">Added {{ brand.created_at.strftime('%b %d, %Y') }}</span>
+                </div>
+                <a href="{{ url_for('brands.brand_detail', brand_id=brand.id) }}" 
+                   class="btn btn-outline-primary">
+                   <i class="bi bi-eye"></i> View Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <div class="alert alert-info">
+            <p class="m-0">No brands found.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

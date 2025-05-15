@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Manage Brands | IDMAX Fashion House{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Manage Brands</h2>
+    <a href="{{ url_for('admin.new_brand') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Add New Brand
+    </a>
+  </div>
+
+  <div class="row">
+    {% for brand in brands %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">{{ brand.name }}</h5>
+            <div class="badge bg-secondary">{{ brand.products.count() }} Products</div>
+          </div>
+          <p class="card-text text-muted small">
+            {% if brand.description %}
+              {{ brand.description | truncate(100) }}
+            {% else %}
+              No description available
+            {% endif %}
+          </p>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-between">
+          <a href="{{ url_for('brands.brand_detail', brand_id=brand.id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-eye"></i> View
+          </a>
+          <div>
+            <a href="{{ url_for('admin.edit_brand', brand_id=brand.id) }}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                    data-bs-target="#deleteBrandModal-{{ brand.id }}">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteBrandModal-{{ brand.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete the brand: <strong>{{ brand.name }}</strong>?
+            {% if brand.products.count() > 0 %}
+            <div class="alert alert-warning mt-3">
+              <i class="bi bi-exclamation-triangle"></i> This brand has {{ brand.products.count() }} associated products. 
+              You cannot delete a brand with associated products.
+            </div>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form action="{{ url_for('admin.delete_brand', brand_id=brand.id) }}" method="POST">
+              <button type="submit" class="btn btn-danger" 
+                      {% if brand.products.count() > 0 %}disabled{% endif %}>Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
