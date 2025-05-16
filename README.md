@@ -30,8 +30,8 @@ A database-driven Flask web application that displays fashion product data from 
 
 1. Clone the repository:
 bash
-git clone https://github.com/yourusername/fashion-catalog.git
-cd fashion-catalog
+git clone https://github.com/aymaxine/IDMAX-Fashion-House.git
+cd project_flask
 
 2. Create and activate a virtual environment:
 bash
@@ -69,7 +69,7 @@ pytest
 ## Project Structure
 
 ```
-fashion-catalog/
+project_flask/
 ├── app/
 │   ├── __init__.py        # Flask application factory
 │   ├── handlers.py        # Error handlers
@@ -79,7 +79,7 @@ fashion-catalog/
 │   │   ├── brands.py
 │   │   ├── main.py
 │   │   └── products.py
-│   ├── static/            # Static files (CSS, JS, images)
+│   ├── static/            # Static files (CSS, images)
 │   │   └── css/
 │   │       └── style.css
 │   └── templates/         # Jinja2 templates
